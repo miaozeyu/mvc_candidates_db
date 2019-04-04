@@ -4,6 +4,8 @@ from flask import make_response
 from flask import request
 from flask import url_for
 from math import ceil
+import hashlib
+import json
 
 from data_provider_service import DataProviderService
 
@@ -30,7 +32,12 @@ def candidate(serialize = True):
         candidates = candidates[from_idx:stop_idx]
 
     if serialize:
-        return jsonify({"candidates": candidates, "total": len(candidates)})
+        data = {"candidates": candidates, "total": len(candidates)}
+        json_data = json.dumps(data)
+        response = make_response(jsonify(data), 200)
+        response.headers["ETag"] = str(hashlib.sha256(json_data.encode('utf-8')).hexdigest())
+        response.headers["Cache-Control"] = "private, max - age=300"
+        return response
     else:
         return candidates
 
