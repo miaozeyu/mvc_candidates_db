@@ -62,10 +62,24 @@ def fill_database():
 
 
 def delete_candidate(id):
-    if DATA_PROVIDER.delete_candidate(id):
-        return make_response('', 204)
-    else:
-        return make_response('', 404)
+    try:
+        if DATA_PROVIDER.delete_candidate(id):
+            return make_response('', 204)
+        else:
+            return make_response('', 404)
+    except ValueError as err:
+        tmp_response = make_response('', 500)
+        tmp_response.headers["X-DeleteCandidate-ERROR-CODE"] = get_error_code(err)
+        tmp_response.headers["X-DeleteCandidate-ERROR-MESSAGE"] =  str(err)
+
+        return tmp_response
+
+
+def get_error_code(error):
+    if "parameter" in str(error).lower():
+        return 9100
+
+    return 9100
 
 def add_candidate():
     first_name = request.form["first_name"]

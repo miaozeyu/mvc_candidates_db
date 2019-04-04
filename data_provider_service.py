@@ -103,10 +103,14 @@ class DataProviderService:
         return updated_candidate.serialize()
 
     def delete_candidate(self, id):
+        if int(id) < 0:
+            raise  ValueError("Parameter [id] should be a positive number!")
+
         if id:
             items_deleted = self.session.query(Candidate).filter(Candidate.id == id).delete()
             self.session.commit()
             return items_deleted > 0
+
         return False
 
 
