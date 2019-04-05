@@ -6,6 +6,7 @@ from flask import url_for
 from math import ceil
 import hashlib
 import json
+from decorators import check_token
 
 from data_provider_service import DataProviderService
 
@@ -14,6 +15,7 @@ db_engine = 'mysql+mysqldb://root:@localhost/hrdb'
 PAGE_SIZE = 2
 
 DATA_PROVIDER = DataProviderService(db_engine)
+
 
 def candidate(serialize = True):
     candidates = DATA_PROVIDER.get_candidate(serialize=serialize)
@@ -41,7 +43,7 @@ def candidate(serialize = True):
     else:
         return candidates
 
-
+@check_token
 def candidate_by_id(id):
     current_candidate = DATA_PROVIDER.get_candidate(id, serialize=True)
     if current_candidate:

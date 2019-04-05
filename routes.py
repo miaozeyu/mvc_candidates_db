@@ -3,6 +3,7 @@ from flask import render_template
 from flask import flash
 from flask import current_app
 from flask import abort
+from flask import make_response
 
 from middleware import candidate_by_id
 from middleware import candidate
@@ -12,7 +13,10 @@ from middleware import delete_candidate
 from middleware import initialize_database as init_db
 from middleware import fill_database as fill_db
 from middleware import build_message
+
 from decorators import authenticate
+
+TOKEN_HEADER_NAME = "MY_AUTH_TOKEN"
 
 def init_api_routes(app):
     if app:
@@ -26,12 +30,14 @@ def init_api_routes(app):
         app.add_url_rule('/api', 'list_routes', list_routes, methods=['GET'], defaults={'app': app})
 
 @authenticate
-def page_about():
+def page_about(*args, **kwargs):
     if current_app:
         flash('The application was loaded', 'info')
         flash('The secret key is {0}'.format(current_app.config['SECRET_KEY']), 'info')
 
-    return render_template('about.html', selected_menu_item="about")
+    resp = make_response(render_template('about.html', selected_menu_item="about"))
+    resp.headers[TOKEN_HEADER_NAME] = kwargs[TOKEN_HEADER_NAME]
+    return resp
 
 
 def page_project():
