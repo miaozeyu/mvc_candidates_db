@@ -4,6 +4,7 @@ from flask import flash
 from flask import current_app
 from flask import abort
 from flask import make_response
+from flask import request
 
 from middleware import candidate_by_id
 from middleware import candidate
@@ -49,6 +50,8 @@ def page_experience():
 
 
 def page_candidate():
+    my_cookie = request.cookies.get('myCookie')
+    print('Cookie from the client:' + my_cookie)
     current_candidates = candidate(serialize=False)
     return render_template('candidate.html', selected_menu_item="candidate", candidates=current_candidates)
 
@@ -58,7 +61,9 @@ def page_add_candidate():
 
 
 def page_index():
-    return render_template('index.html', selected_menu_item="index")
+    resp = make_response(render_template('index.html', selected_menu_item="index"))
+    resp.set_cookie('myCookie', 'this is a custom cookie sent from the server')
+    return resp
 
 
 def crash_server():
